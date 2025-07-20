@@ -1,0 +1,56 @@
+# Разрешаем трафик между front-end и back-end-api
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-frontend-to-backend
+spec:
+  podSelector:
+    matchLabels:
+      role: back-end-api
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          role: front-end
+  egress:
+  - to:
+    - podSelector:
+        matchLabels:
+          role: front-end
+---
+# Разрешаем трафик между admin-front-end и admin-back-end-api
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-admin-frontend-to-backend
+spec:
+  podSelector:
+    matchLabels:
+      role: admin-back-end-api
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          role: admin-front-end
+  egress:
+  - to:
+    - podSelector:
+        matchLabels:
+          role: admin-front-end
+---
+# Запрещаем весь остальной трафик между группами
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: deny-cross-traffic
+spec:
+  podSelector: {}
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  - from:
+    - podSelector: {}
+  egress:
+  - to:
+    - podSelector: {}
